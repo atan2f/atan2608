@@ -57,6 +57,10 @@ public:
                     int buttonX, int buttonY, int buttonW, int buttonH,
                     juce::ComboBox&) override;
 
+  // Position the combo's text label; forces truncation (not JUCE's default
+  // horizontal squish) when the name overruns the box.
+  void positionComboBoxText(juce::ComboBox&, juce::Label&) override;
+
   // Chunky horizontal value bar (LinearBar style) -> drawValueBar.
   void drawLinearSlider(juce::Graphics&, int x, int y, int width, int height,
                         float sliderPos, float minSliderPos, float maxSliderPos,

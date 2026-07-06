@@ -708,7 +708,7 @@ void PluginEditor::resized() {
   // then Del, then Rev. Rev only shows when the patch is dirty, so the core block
   // (through Del) is centred at a fixed width and Rev hangs off its right edge,
   // keeping the block from shifting as Rev appears/disappears.
-  constexpr int kInitW = 56, kSaveW = 56, kBoxW = 150, kStepW = 30, kDelW = 48,
+  constexpr int kInitW = 56, kSaveW = 56, kBoxW = 210, kStepW = 30, kDelW = 48,
                 kRevW = 48;
   const int coreW =
       kInitW + kSaveW + kBoxW + 2 * kStepW + kDelW + 5 * kBtnGap;

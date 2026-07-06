@@ -175,6 +175,16 @@ void OpnaLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, boo
   g.fillPath(arrow);
 }
 
+void OpnaLookAndFeel::positionComboBoxText(juce::ComboBox& box,
+                                           juce::Label& label) {
+  // Leave room on the right for the drop arrow (drawn at width-12).
+  label.setBounds(4, 1, box.getWidth() - 18, box.getHeight() - 2);
+  label.setFont(getComboBoxFont(box));
+  // Truncate with an ellipsis rather than squishing the glyphs horizontally
+  // (JUCE's default 0.7 minimum scale) when the preset name overruns the box.
+  label.setMinimumHorizontalScale(1.0f);
+}
+
 void OpnaLookAndFeel::drawLinearSlider(juce::Graphics& g, int x, int y, int width,
                                        int height, float sliderPos, float,
                                        float, juce::Slider::SliderStyle,
