@@ -1,0 +1,8 @@
+#pragma once
+
+// Generated from Version.h.in by cmake/GitVersion.cmake. Surfaced in the editor's
+// Settings panel so the running build is always identifiable. Regenerated on every
+// build (the opna_version target), so the commit hash tracks the live git state
+// without needing a reconfigure.
+#define OPNA_GIT_COMMIT "@OPNA_GIT_COMMIT@"
+#define OPNA_VERSION "@OPNA_VERSION@"

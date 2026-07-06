@@ -1,0 +1,110 @@
+name: Release
+
+# Cut a public GitHub Release when a version tag is pushed, e.g.:
+#   git tag v1.2.3 && git push origin v1.2.3
+# Builds Windows + Linux and attaches the VST3 and standalone to the Release.
+on:
+  push:
+    tags: ['v*']
+
+# Required so the release job can create a Release and upload assets.
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            name: Windows
+          - os: ubuntu-latest
+            name: Linux
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y \
+            ninja-build \
+            libasound2-dev \
+            libfreetype-dev \
+            libfontconfig1-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxext-dev
+
+      - name: Set up MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
+      # Compiler cache; requires the Ninja generator (see build.yml for why).
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: release-${{ matrix.name }}
+
+      - name: Configure
+        run: >
+          cmake -B release-build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      # Only the two shipped formats (no test target - tests are run locally).
+      - name: Build
+        run: cmake --build release-build --target AudioPlugin_Standalone AudioPlugin_VST3
+
+      # Stage a per-OS zip containing the VST3 and the standalone, so each
+      # platform contributes one clearly named asset to the Release.
+      - name: Stage release assets (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p stage
+          cp -r release-build/AudioPlugin_artefacts/Release/VST3/atan2608.vst3 stage/
+          cp release-build/AudioPlugin_artefacts/Release/Standalone/atan2608.exe stage/
+          cd stage && 7z a "../atan2608-${{ github.ref_name }}-Windows.zip" .
+
+      - name: Stage release assets (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p stage
+          cp -r release-build/AudioPlugin_artefacts/Release/VST3/atan2608.vst3 stage/
+          cp release-build/AudioPlugin_artefacts/Release/Standalone/atan2608 stage/
+          cd stage && zip -r "../atan2608-${{ github.ref_name }}-Linux.zip" .
+
+      # Publish via the official gh CLI (preinstalled on runners) - no
+      # third-party actions. `release create` makes the Release on the first
+      # run; the matrix's second OS finds it already exists and just uploads
+      # its asset with `release upload --clobber`.
+      - name: Upload to GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ github.ref_name }}"
+          asset=$(ls atan2608-"$tag"-*.zip)
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            # Both matrix jobs run in parallel and may both reach here before
+            # either Release exists. If create loses that race, fall back to
+            # uploading onto the Release the other job just made.
+            gh release create "$tag" "$asset" --title "$tag" --generate-notes \
+              || gh release upload "$tag" "$asset" --clobber
+          fi

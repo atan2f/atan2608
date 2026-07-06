@@ -1,0 +1,45 @@
+// Custom Windows resource script for atan2608, used via JUCE_USER_DEFINED_RC_FILE.
+//
+// This file is a template: CMake generates atan2608.rc from it (configure_file,
+// @ONLY), stamping the version from version.txt into the VERSIONINFO below. Edit
+// this .in, not the generated .rc.
+//
+// JUCE's generated <target>_resources.rc wraps its auto VERSIONINFO + icon in
+//   #ifdef JUCE_USER_DEFINED_RC_FILE / #include JUCE_USER_DEFINED_RC_FILE / #else
+// so defining that macro replaces the WHOLE block with this file. We therefore
+// replicate the version info here AND point the icon at our hand-built icon.ico
+// (every size rendered natively by scripts/gen_icon.py - no bilinear blur, unlike
+// juceaide's single-PNG rescale). See the wiring in CMakeLists.txt.
+
+#pragma code_page(65001)
+
+#undef  WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION  @ATAN_VER_COMMA@
+PRODUCTVERSION  @ATAN_VER_COMMA@
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "atan2\0"
+      VALUE "FileDescription",  "atan2608\0"
+      VALUE "FileVersion",      "@ATAN_VER_DOT@\0"
+      VALUE "ProductName",      "atan2608\0"
+      VALUE "ProductVersion",   "@ATAN_VER_DOT@\0"
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1252
+  END
+END
+
+// Resolved from the rc include dirs (CMakeLists adds audio_plugin/ when the
+// JUCE_USER_DEFINED_RC_FILE macro is set).
+IDI_ICON1 ICON DISCARDABLE "icon.ico"
+IDI_ICON2 ICON DISCARDABLE "icon.ico"
