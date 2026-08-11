@@ -17,7 +17,7 @@ struct SsgPatch {
   enum Mix { kTone = 0, kNoise = 1, kToneNoise = 2, kOff = 3 };
 
   int mix = kTone;        // tone / noise / both / off (pooled voice)
-  int volume = 0;         // 0..15 (used when envEnable is false); 0 = silent
+  int volume = 12;        // 0..15 (used when envEnable is false); 0 = silent
   bool envEnable = false; // use the hardware envelope instead of fixed volume
   int envPeriod = 2000;   // 0..65535 (16-bit) -- shared generator
   int envShape = 8;       // 0..15 (8..15 repeat) -- shared generator
@@ -36,7 +36,7 @@ struct SsgPatch {
 // uses still come from the shared generators in SsgPatch.
 struct SsgVoice {
   int mix = SsgPatch::kTone;  // tone / noise / both / off
-  int volume = 0;             // 0..15
+  int volume = 12;            // 0..15
   bool envEnable = false;     // use the shared HW envelope
 
   bool operator==(const SsgVoice& o) const {

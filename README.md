@@ -123,11 +123,10 @@ last-note priority, and every note re-attacks like a real chip retrigger.
 
 - **Multi-frequency mode** (default): four operators, each with its own
   COARSE/CENTS detune and key-follow or fixed pitch - great for bell/cluster
-  timbres. (See *FM3 Bells*.)
+  timbres.
 - **CSM mode**: Timer A retriggers all four operators at the played-note rate,
   turning the operator pitches into fixed *formants* - the chip's speech/choir
   trick. The played note sets the fundamental; the operators set the vowel.
-  (See *CSM Vox* / *CSM Ooh*.)
 
 ### SSG (square / noise)
 
@@ -138,10 +137,11 @@ Three PSG voices (A/B/C). Each channel is independently either:
   poly square/noise part.
 - **Independent** - its own monophonic voice with its own mix/volume/envelope
   *and* its own MIDI channel / key range, so you can split (e.g.) a square bass
-  and a noise percussion across the keyboard. (See *SSG Bass+Noise*.)
+  and noise percussion across the keyboard, or layer several octaves on one
+  channel. (See *SSG Octave Stack*.)
 
 Controls: **MIX** (Tone / Noise / Tone+Noise / Off), **VOLUME** (0-15; the
-default 0 means the SSG starts silent), **HW ENV** (use the chip's hardware
+default is 12), **HW ENV** (use the chip's hardware
 envelope instead of a fixed level), plus the shared **noise period**, **envelope
 period** and **envelope shape**. Note the hardware limits: there's a single
 shared noise generator and a single shared envelope generator, so two channels
@@ -194,6 +194,16 @@ the Start/End window and a loop indicator.
 > this is faithful hardware behaviour. Turn on **Re-Enc** to re-encode the sample
 > with a fresh predictor reset at the start point, so a mid-sample start (and each
 > loop) plays at full level instead.
+>
+> There is another end-of-region quirk: ADPCM-B addresses external RAM in
+> **32-byte units** (64 decoded samples), and ymfm models the decoder's
+> three-nibble look-ahead pipeline by withholding the final **three samples** of
+> that addressed region. On repeat, the predictor/step reset and playback begins
+> again at Start. A mathematically seamless source loop can therefore still click
+> unless it is aligned to the chip's *effective* region rather than merely to the
+> source endpoints. The factory **Sampler Saw** demonstrates the workaround: its
+> waveform is phase-aligned across the samples the chip actually outputs, followed
+> by three guard samples consumed by the end-of-region pipeline.
 
 ---
 
@@ -236,17 +246,22 @@ Reachable from **Preset -> Factory**:
 
 | Preset | What it is |
 |---|---|
-| **Bright Brass** | 2-op FM brass with feedback. |
+| **Bright Brass** | Two-stack FM brass with a rounded attack and bright upper bite. |
 | **Bell** | Inharmonic 2-op FM with a long metallic tail. |
 | **Bass** | Punchy 2-op FM bass. |
-| **SSG Lead** | FM silenced, a pooled SSG square lead. |
-| **CSM Vox** | CH3 CSM "ah" formant choir. |
-| **CSM Ooh** | CH3 CSM "ooh" formant voice. |
+| **Electric Piano** | Two-stack FM electric piano with a bright tine transient. |
+| **Drawbar Organ** | Additive four-harmonic organ. |
+| **Digital Pluck** | Bright four-operator attack over a quieter plucked body. |
+| **Soft Strings** | Slow additive ensemble voice. |
+| **FM Lead** | Focused, harmonically rich two-stack lead. |
+| **Glass Keys** | Additive glass mallet with a shimmering decay. |
+| **Arcade Layer** | FM body layered with a quiet SSG octave. |
+| **SSG Init** | Plain pooled SSG tone on MIDI channel 1, ready for editing. |
+| **SSG Tremolo Lead** | Pooled SSG lead animated by the shared hardware envelope. |
 | **Split Bass-Lead** | Keyboard split: a 3-voice FM bass (low) + 3-voice FM lead (high). |
 | **Stacked Pad** | Two detuned FM layers panned apart for width. |
-| **FM3 Bells** | CH3 multi-frequency mode - four operators as a bell overtone stack. |
-| **SSG Bass+Noise** | Independent SSG: square bass (low) + noise percussion (high). |
-| **Kit + SSG Bass** | Rhythm drums (ch 10) + an independent SSG tone bass (ch 1). |
+| **SSG Octave Stack** | Three independent SSG tones layered at -1 / 0 / +1 octaves. |
+| **Sampler Saw** | Looping embedded saw wave on MIDI channel 1, ready as a sampler starting point. |
 
 ---
 

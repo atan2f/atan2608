@@ -1,12 +1,17 @@
 #include "SsgParameters.h"
 
+#include <cmath>
+
 #include "KeyParameter.h"
 
 namespace audio_plugin {
 
 namespace {
 int ssgAsInt(const std::atomic<float>* p) {
-  return p != nullptr ? static_cast<int>(p->load() + 0.5f) : 0;
+  // Several parameters using this path have signed ranges (SSG and sampler
+  // octave transpose). Adding 0.5 then truncating biases every negative value
+  // upward: -1 became 0, -2 became -1, etc.
+  return p != nullptr ? static_cast<int>(std::lround(p->load())) : 0;
 }
 bool ssgAsBool(const std::atomic<float>* p) {
   return p != nullptr && p->load() >= 0.5f;
