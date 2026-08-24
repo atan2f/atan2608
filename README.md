@@ -119,7 +119,9 @@ four operators an independent pitch** - something normal FM channels can't do.
 Enable it by clicking the **CH3 column header** in the FM-page CH PART matrix;
 that reveals the **FM3 SP** tab (its full editor) and the **FM CH3 SP** routing
 row on the GLOBAL page. It's **monophonic** (authentic to the hardware) with
-last-note priority, and every note re-attacks like a real chip retrigger.
+last-note priority and no held-note recall: releasing the sounding note does
+not resume an earlier held note. Every note re-attacks like a real chip
+retrigger.
 
 - **Multi-frequency mode** (default): four operators, each with its own
   COARSE/CENTS detune and key-follow or fixed pitch - great for bell/cluster
@@ -327,9 +329,6 @@ The VST3 builds from the `AudioPlugin_VST3` target. Tests:
 cmake --build build --target AudioPluginTest --config Debug
 build/test/Debug/AudioPluginTest.exe
 ```
-
-See [CLAUDE.md](CLAUDE.md) for the architecture, the "part" pattern, and the
-non-obvious YM2608 implementation notes.
 
 ---
 
